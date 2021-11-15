@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ *
+ * we implement our own token introspector using the delegate pattern
+ */
 public class ResolutionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 	private final OpaqueTokenIntrospector delegate;
 	private final UserRepository users;
@@ -28,9 +32,11 @@ public class ResolutionOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
+		// let the out of the box implementation do the bulk of the work
 		OAuth2AuthenticatedPrincipal principal = this.delegate.introspect(token);
 
-		System.err.println("PRICINPAL");
+//		System.err.println("PRICINPAL");
+		// basically just doing custom type mapping
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			System.out.println(mapper.writeValueAsString(principal));
@@ -47,6 +53,7 @@ public class ResolutionOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 		UUID userId = UUID.fromString(principal.getAttribute("user_id"));
 		attributes.put("user_id", userId);
 
+		// this piece is for tying a user identity to an authorization token which isn't used for identifying a user necessarily
 		User user = users.findById(userId)
 				.orElseThrow(() -> new UsernameNotFoundException("no user"));
 		if ("premium".equals(user.getSubscription())) {
@@ -56,9 +63,11 @@ public class ResolutionOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 			}
 		}
 
+		// in the end we need to return the same thing that the default method returns
 		OAuth2AuthenticatedPrincipal delegate =
 				new DefaultOAuth2AuthenticatedPrincipal(name, attributes, authorities);
 
+		// this makes it so the @AuthenticatedPrincipal annotation can cast the result to a User inside the 'Share' method
 		return new BridgeUser(user, delegate);
 	}
 

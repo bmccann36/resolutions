@@ -20,6 +20,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.oauth2ResourceServer(o -> o.opaqueToken());
 	}
 
+	/**
+	 * by publishing this as a bean it will override the default one that comes with spring
+	 */
 	@Bean
 	public OpaqueTokenIntrospector tokenIntrospector(
 			OAuth2ResourceServerProperties properties, UserRepository users) {
