@@ -43,3 +43,19 @@ http PUT :8080/resolution/219168d2-1da4-4f8a-85d8-95b4377af3c1/complete
 ```
 
 Enjoy!
+
+## Brians commands
+
+curl -X GET \
+http://localhost:9999/auth/realms/one/.well-known/uma2-configuration
+
+
+curl -X POST \
+http://localhost:9999/auth/realms/one/protocol/openid-connect/token \
+--data "client_id=client" \
+--data "client_secret=secret" \
+--data "grant_type=client_credentials"
+
+
+http :9999/auth/realms/one/protocol/openid-connect/token client_id=client client_secret=secret grant_type=client_credentials
+

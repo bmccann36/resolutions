@@ -1,5 +1,7 @@
 package io.jzheaux.springsecurity.resolutions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,6 +29,14 @@ public class ResolutionOpaqueTokenIntrospector implements OpaqueTokenIntrospecto
 	@Override
 	public OAuth2AuthenticatedPrincipal introspect(String token) {
 		OAuth2AuthenticatedPrincipal principal = this.delegate.introspect(token);
+
+		System.err.println("PRICINPAL");
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			System.out.println(mapper.writeValueAsString(principal));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 
 		String name = principal.getName();
 		Map<String, Object> attributes =
