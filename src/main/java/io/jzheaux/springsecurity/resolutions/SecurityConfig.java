@@ -16,7 +16,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.authorizeRequests(a -> a
 				.mvcMatchers("/resolutions").hasAuthority("SCOPE_resolution:read")
 				.mvcMatchers("/resolution/{id}/share").hasAuthority("resolution:share")
-				.anyRequest().authenticated())
+					//? EXAMPLE rule : this makes it so you need basic_start_auth to hit /test route
+				.mvcMatchers("/test").hasAuthority("basic_start_authorization")
+				.anyRequest().authenticated()
+			)
 			.oauth2ResourceServer(o -> o.opaqueToken());
 	}
 
@@ -29,8 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		String url = properties.getOpaquetoken().getIntrospectionUri();
 		String clientId = properties.getOpaquetoken().getClientId();
 		String clientSecret = properties.getOpaquetoken().getClientSecret();
+		// delegate not needed for basic mbusa use case
 		OpaqueTokenIntrospector delegate = new NimbusOpaqueTokenIntrospector
 				(url, clientId, clientSecret);
-		return new ResolutionOpaqueTokenIntrospector(delegate, users);
+//		return new ResolutionOpaqueTokenIntrospector(delegate, users);
+		return new GasOidcTokenIntrospector();
 	}
 }
